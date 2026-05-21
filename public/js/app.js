@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // In browser (non-PWA), hide the address bar but keep the system nav bar
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.navigator.standalone === true;
+    if (!isPWA) {
+        const requestFullscreen = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen({ navigationUI: 'show' })
+                    .catch(() => {});
+            }
+        };
+        document.body.addEventListener('click', requestFullscreen, { once: true });
+        document.body.addEventListener('touchstart', requestFullscreen, { once: true });
+    }
+
     // Prevent default context menu (makes it feel more native)
     window.addEventListener('contextmenu', e => {
         // Only prevent if we are not in an input field (for settings)
@@ -39,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleButtonPress(btn);
     });
     
-    keypad.addEventListener('pointerleave', (e) => {
+    keypad.addEventListener('pointerleave', () => {
         if (pressTimer) clearTimeout(pressTimer);
     });
 
