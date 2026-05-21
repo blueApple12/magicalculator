@@ -8,8 +8,7 @@ class ForceSystem {
         this.locked = false;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        // pointerup fires exactly once per tap on mobile (no synthetic-click duplicates)
-        this.overlay.addEventListener('pointerup', this.handleOverlayClick.bind(this));
+        this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
@@ -99,9 +98,11 @@ class ForceSystem {
                     forceString = operator + forceString;
                 }
 
-                this.collectiveForce = forceString;
-                // Delay overlay activation so the '.' synthetic events don't fire on it
-                setTimeout(() => { this.overlay.classList.add('active'); }, 250);
+                // Delay everything so the '.' press / synthetic click doesn't trigger anything
+                setTimeout(() => {
+                    this.collectiveForce = forceString;
+                    this.overlay.classList.add('active');
+                }, 250);
             }
 
             this.vibrate();
