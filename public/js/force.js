@@ -6,9 +6,23 @@ class ForceSystem {
         this.collectiveForce = '0';
         this.hud = false;
         this.lockedUntil = 0;
+        this.lastTapTime = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
+        this.keypad = document.getElementById('keypad');
+
+        // Use pointerup ONLY (fires exactly once on mobile, no synthetic-click duplicates)
+        // with debounce so any stray duplicate within 80ms is dropped
+        this.overlay.addEventListener('pointerup', (e) => {
+            e.stopPropagation();
+            const now = Date.now();
+            if (now - this.lastTapTime < 80) return;
+            this.lastTapTime = now;
+            this.handleOverlayClick();
+        });
+        // Block any clicks that try to leak through to buttons under the overlay
+        this.overlay.addEventListener('click',     (e) => { e.stopPropagation(); e.preventDefault(); });
+        this.overlay.addEventListener('touchstart',(e) => { e.preventDefault(); }, { passive: false });
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
@@ -98,10 +112,11 @@ class ForceSystem {
                     forceString = operator + forceString;
                 }
 
-                // Delay everything so the '.' press / synthetic click doesn't trigger anything
+                // Delay so the '.' press / synthetic events don't trigger the first digit
                 setTimeout(() => {
                     this.collectiveForce = forceString;
                     this.overlay.classList.add('active');
+                    this.keypad.style.pointerEvents = 'none'; // hard-block button taps
                 }, 250);
             }
 
@@ -114,7 +129,8 @@ class ForceSystem {
     handleOverlayClick() {
         if (Date.now() < this.lockedUntil) return;
         if (this.collectiveForce === '0') {
-            this.overlay.classList.remove('active'); // defensive cleanup
+            this.overlay.classList.remove('active');
+            this.keypad.style.pointerEvents = '';
             return;
         }
 
@@ -125,8 +141,9 @@ class ForceSystem {
 
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
-            this.overlay.classList.remove('active'); // hide overlay IMMEDIATELY
-            this.lockedUntil = Date.now() + 500;     // freeze button presses for 500ms
+            this.overlay.classList.remove('active');
+            this.keypad.style.pointerEvents = '';    // re-enable buttons
+            this.lockedUntil = Date.now() + 500;     // silent 500ms freeze
         }
     }
 
