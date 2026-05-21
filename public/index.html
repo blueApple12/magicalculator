@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MagiCalculator</title>
+    <meta name="theme-color" content="#1a1a1a">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="calculator-app">
+        <!-- Main Calculator Screen -->
+        <main id="calculator-view">
+            <!-- Hidden overlay area to trigger settings -->
+            <div id="settings-trigger-area"></div>
+            
+            <!-- Force effect overlay (pulsing effect for performer) -->
+            <div id="force-active-indicator"></div>
+
+            <div id="display-area">
+                <div id="expression-preview"></div>
+                <div id="main-display">0</div>
+            </div>
+
+            <div id="keypad">
+                <button class="btn btn-action" data-action="clear" id="btn-clear">C</button>
+                <button class="btn btn-action" data-action="backspace" id="btn-backspace">⌫</button>
+                <button class="btn btn-action" data-action="percentage" id="btn-percentage">%</button>
+                <button class="btn btn-operator" data-action="operator" data-value="÷">÷</button>
+
+                <button class="btn btn-number" data-value="7">7</button>
+                <button class="btn btn-number" data-value="8">8</button>
+                <button class="btn btn-number" data-value="9">9</button>
+                <button class="btn btn-operator" data-action="operator" data-value="×">×</button>
+
+                <button class="btn btn-number" data-value="4">4</button>
+                <button class="btn btn-number" data-value="5">5</button>
+                <button class="btn btn-number" data-value="6">6</button>
+                <button class="btn btn-operator" data-action="operator" data-value="-">-</button>
+
+                <button class="btn btn-number" data-value="1">1</button>
+                <button class="btn btn-number" data-value="2">2</button>
+                <button class="btn btn-number" data-value="3">3</button>
+                <button class="btn btn-operator" data-action="operator" data-value="+">+</button>
+
+                <button class="btn btn-action" data-action="plusminus" id="btn-plusminus">±</button>
+                <button class="btn btn-number" data-value="0">0</button>
+                <button class="btn btn-action" data-action="dot" id="btn-dot">.</button>
+                <button class="btn btn-equals" data-action="equals" id="btn-equals">=</button>
+            </div>
+            
+            <!-- Fullscreen click interceptor for CollectiveForce -->
+            <div id="collective-force-overlay"></div>
+        </main>
+
+        <!-- Settings Screen (Hidden by default) -->
+        <section id="settings-view" class="hidden">
+            <header>
+                <h2>Force Setup</h2>
+                <button id="close-settings" class="btn-icon">✕</button>
+            </header>
+            
+            <div class="settings-content">
+                <p class="settings-help">Set your force values. Check "Time" to add seconds to the current time (format: ddMMHHmm).</p>
+                
+                <div id="forces-list">
+                    <!-- Dynamically populated via JS -->
+                </div>
+            </div>
+            
+            <footer>
+                <button id="save-settings" class="btn-primary">Save Forces</button>
+            </footer>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/calculator.js"></script>
+    <script src="js/force.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

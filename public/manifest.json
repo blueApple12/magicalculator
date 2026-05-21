@@ -1,0 +1,18 @@
+{
+  "name": "MagiCalculator",
+  "short_name": "Calculator",
+  "description": "A fully functional calculator with a hidden magic trick engine.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
