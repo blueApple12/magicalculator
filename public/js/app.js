@@ -66,11 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pressTimer) clearTimeout(pressTimer);
     });
 
+    // Tapping the display area during collective force also types a digit
+    document.getElementById('display-area').addEventListener('pointerup', () => {
+        if (forceSystem.collectiveForce !== '0') forceSystem.handleOverlayClick();
+    });
+
     function handleButtonPress(btn) {
-        // If collective force is active, let the overlay handle it
+        // During collective force every button tap types the next digit
         if (forceSystem.collectiveForce !== '0') {
-            // Actually, overlay intercepts clicks because it's z-index 100
-            // but just in case:
+            forceSystem.handleOverlayClick();
             return;
         }
 

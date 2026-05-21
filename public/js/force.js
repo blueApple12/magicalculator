@@ -8,7 +8,6 @@ class ForceSystem {
         this.locked = false;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
