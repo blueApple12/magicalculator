@@ -9,10 +9,6 @@ class ForceSystem {
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
-        this.overlay.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.handleOverlayClick();
-        });
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
@@ -128,7 +124,7 @@ class ForceSystem {
             setTimeout(() => {
                 this.locked = false;
                 this.overlay.classList.remove('active');
-            }, 1000);
+            }, 500);
         }
     }
 
