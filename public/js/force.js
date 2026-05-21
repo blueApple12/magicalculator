@@ -5,7 +5,7 @@ class ForceSystem {
         this.toxicForce = false;
         this.collectiveForce = '0';
         this.hud = false;
-        this.locked = false;
+        this.lockedUntil = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
@@ -112,8 +112,11 @@ class ForceSystem {
     }
 
     handleOverlayClick() {
-        if (this.locked) return;
-        if (this.collectiveForce === '0') return;
+        if (Date.now() < this.lockedUntil) return;
+        if (this.collectiveForce === '0') {
+            this.overlay.classList.remove('active'); // defensive cleanup
+            return;
+        }
 
         this.vibrate();
         const char = this.collectiveForce[0];
@@ -122,11 +125,8 @@ class ForceSystem {
 
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
-            this.locked = true;
-            setTimeout(() => {
-                this.locked = false;
-                this.overlay.classList.remove('active');
-            }, 500);
+            this.overlay.classList.remove('active'); // hide overlay IMMEDIATELY
+            this.lockedUntil = Date.now() + 500;     // freeze button presses for 500ms
         }
     }
 
