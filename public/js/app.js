@@ -145,9 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then(registration => {
-                console.log('SW registered: ', registration);
-            }).catch(registrationError => {
-                console.log('SW registration failed: ', registrationError);
+                // Force-check for a new SW version on every page load (bypasses HTTP cache)
+                registration.update();
+            }).catch(() => {});
+
+            // When a new SW takes over, reload so fresh assets are served
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                window.location.reload();
             });
         });
     }
