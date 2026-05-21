@@ -146,7 +146,7 @@ class ForceSystem {
         const pmPlus  = document.getElementById('pm-plus');
         const pmMinus = document.getElementById('pm-minus');
         const numBtns = document.querySelectorAll('.btn-number');
-        const TINT    = '#fff2ec'; // barely-visible warm tint
+        const TINT    = '#ffaa70'; // soft orange tint
 
         if (this.hud) {
             const target = parseFloat(this.getForceValue(this.toxicNum));
