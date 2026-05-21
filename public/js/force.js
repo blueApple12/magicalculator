@@ -1,24 +1,21 @@
 class ForceSystem {
     constructor() {
-        this.toxicNum = 0;             // currently selected slot (0-9)
-        this.pendingSlot = false;      // long-press % arms slot selection
+        this.toxicNum = 0;
+        this.pendingSlot = false;
         this.toxicForce = false;
-        this.collectiveForce = '0';    // '0' = inactive; else = diff digit string
+        this.collectiveForce = '0';
         this.hud = false;
-
-        this.overlay = document.getElementById('collective-force-overlay');
-        this.indicator = document.getElementById('force-active-indicator');
         this.locked = false;
         this.justActivated = false;
 
-        // Any tap anywhere fires the overlay when collective force is active
+        this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
         this.overlay.addEventListener('touchstart', (e) => {
             e.preventDefault();
             this.handleOverlayClick();
         });
 
-        // Long-press on % resets slot selection
+        // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
         let longPressTimer;
         pctBtn.addEventListener('pointerdown', () => {
@@ -33,7 +30,6 @@ class ForceSystem {
         this.vibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
     }
 
-    /* ── Storage ── */
     getForces() {
         try {
             const saved = localStorage.getItem('magi_forces');
@@ -57,35 +53,30 @@ class ForceSystem {
         return isNaN(parseFloat(val)) ? '0' : val;
     }
 
-    /* ── Slot selection (called from number button handler in app.js) ── */
     selectSlot(num) {
         if (this.pendingSlot) {
             this.toxicNum = num;
             this.pendingSlot = false;
-            this.vibrate();
-            return true; // consumed — don't type the number
-        }
-        return false;
-    }
-
-    /* ── % button: toggle toxicForce ── */
-    handlePercentageClick() {
-        if (this.collectiveForce === '0') {
-            this.toxicForce = !this.toxicForce;
-            this.indicator.classList.toggle('active', this.toxicForce);
             this.vibrate();
             return true;
         }
         return false;
     }
 
-    /* ── . button: arm collective force ── */
+    handlePercentageClick() {
+        if (this.collectiveForce === '0') {
+            this.toxicForce = !this.toxicForce;
+            this.vibrate();
+            return true;
+        }
+        return false;
+    }
+
     calculateCollectiveForce() {
         if (this.collectiveForce === '0') {
             const target = parseFloat(this.getForceValue(this.toxicNum));
             const calc   = window.calcInstance;
 
-            // Evaluate current display to a number
             let current = 0;
             try {
                 const raw = calc.currentValue
@@ -96,7 +87,7 @@ class ForceSystem {
                 current = parseFloat(new Function('return ' + (raw || '0'))()) || 0;
             } catch(_) {}
 
-            const diff = Math.round(target - current);
+            const diff    = Math.round(target - current);
             const absDiff = Math.abs(diff);
 
             if (absDiff > 0) {
@@ -106,14 +97,11 @@ class ForceSystem {
 
                 let forceString = absDiff.toString();
                 if (!isOp) {
-                    // No operator at end — prepend correct one
                     forceString = operator + forceString;
                 } else if ((lastChar === '+' || lastChar === '-') && lastChar !== operator) {
-                    // Wrong +/- operator — swap it out
                     calc.currentValue = calc.currentValue.slice(0, -1);
                     forceString = operator + forceString;
                 }
-                // Correct operator already there, or × ÷ — just type digits
 
                 this.collectiveForce = forceString;
                 this.justActivated = true;
@@ -127,7 +115,6 @@ class ForceSystem {
         return false;
     }
 
-    /* ── Overlay tap: type next digit of diff ── */
     handleOverlayClick() {
         if (this.locked || this.justActivated) return;
         if (this.collectiveForce === '0') return;
@@ -135,13 +122,10 @@ class ForceSystem {
         this.vibrate();
         const char = this.collectiveForce[0];
         this.collectiveForce = this.collectiveForce.slice(1);
-
         window.calcInstance.forceInput(char);
 
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
-            this.indicator.classList.remove('pulse');
-            // Freeze for 1 second — overlay stays active but taps do nothing
             this.locked = true;
             setTimeout(() => {
                 this.locked = false;
@@ -150,17 +134,16 @@ class ForceSystem {
         }
     }
 
-    /* ── ± button: toggle HUD (always intercepts ±) ── */
     toggleHud() {
         if (this.collectiveForce === '0') {
             this.hud = !this.hud;
             this.updateHudVisuals();
         }
-        return true; // always consume ± — original never does plusMinus
+        return true;
     }
 
     updateHudVisuals() {
-        const btnPM  = document.getElementById('btn-plusminus');
+        const btnPM   = document.getElementById('btn-plusminus');
         const numBtns = document.querySelectorAll('.btn-number');
 
         if (this.hud) {
@@ -179,39 +162,28 @@ class ForceSystem {
             const diff       = Math.round(target - current);
             const diffLength = Math.abs(diff).toString().length;
 
-            btnPM.classList.add('hud-active');
-            // Keep same visual size as ± by stacking + and − like the symbol,
-            // just dimming the irrelevant half — imperceptible to the spectator
-            const dim = 'style="opacity:0.15"';
-            if (diff > 0) {
-                btnPM.innerHTML = `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:0.85;font-size:0.78em"><span>+</span><span ${dim}>−</span></span>`;
-            } else {
-                btnPM.innerHTML = `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:0.85;font-size:0.78em"><span ${dim}>+</span><span>−</span></span>`;
-            }
+            // Subtle color-only hint: orange = need to add, dim = need to subtract
+            btnPM.style.color = diff > 0
+                ? 'var(--accent-orange)'
+                : 'rgba(255,255,255,0.4)';
 
-            // Dim the number button whose value equals the digit-count of the diff
+            // Dim the number button whose value = digit-count of the diff
             numBtns.forEach(btn => {
-                const val = parseInt(btn.dataset.value);
-                btn.classList.toggle('dimmed', val === diffLength);
+                btn.classList.toggle('dimmed', parseInt(btn.dataset.value) === diffLength);
             });
         } else {
-            btnPM.classList.remove('hud-active');
-            btnPM.textContent = '±';
+            btnPM.style.color = '';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
     }
 
-    /* ── = button: toxic force result ── */
     handleEquals() {
         if (this.collectiveForce === '0' && this.toxicForce) {
             this.toxicForce = false;
-            this.indicator.classList.remove('active');
-
-            const forcedValue = this.getForceValue(this.toxicNum);
             const calc = window.calcInstance;
-            calc.expression = calc.currentValue;
-            calc.currentValue = forcedValue;
-            calc.isEvaluated = true;
+            calc.expression  = calc.currentValue;
+            calc.currentValue = this.getForceValue(this.toxicNum);
+            calc.isEvaluated  = true;
             calc.displayArea.classList.add('evaluated');
             calc.updateDisplay();
             return true;

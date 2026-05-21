@@ -14,20 +14,13 @@
 <body>
     <div id="calculator-app">
         <main id="calculator-view">
-            <div id="force-active-indicator"></div>
-
-            <!-- Samsung-style header -->
             <div id="calc-header">
-                <span id="app-title">Calculator</span>
                 <button id="menu-btn" aria-label="Settings">⋮</button>
+                <span id="app-title">Calculator</span>
             </div>
 
             <div id="display-area">
-                <!-- History (last 2 calculations shown faded) -->
-                <div id="history-list"></div>
-                <!-- Current expression (shown when operator present) -->
                 <div id="expression-preview"></div>
-                <!-- Current number / live result / final result -->
                 <div id="main-display">0</div>
             </div>
 
@@ -61,7 +54,6 @@
             <div id="collective-force-overlay"></div>
         </main>
 
-        <!-- Settings Screen -->
         <section id="settings-view" class="hidden">
             <header>
                 <h2>Force Setup</h2>
