@@ -180,7 +180,7 @@ class ForceSystem {
             const diffLength = Math.abs(diff).toString().length;
 
             btnPM.classList.add('hud-active');
-            // Gray out the direction NOT needed (matching original)
+            btnPM.style.fontSize = '1.1rem';
             if (diff > 0) {
                 btnPM.innerHTML = '<span style="opacity:0.3">+</span>/-';
             } else {
@@ -194,6 +194,7 @@ class ForceSystem {
             });
         } else {
             btnPM.classList.remove('hud-active');
+            btnPM.style.fontSize = '';
             btnPM.textContent = '±';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
