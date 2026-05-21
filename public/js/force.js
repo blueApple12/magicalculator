@@ -5,7 +5,6 @@ class ForceSystem {
         this.toxicForce = false;
         this.collectiveForce = '0';
         this.hud = false;
-        this.lockedUntil = 0;
         this.lastTapTime = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
@@ -127,7 +126,6 @@ class ForceSystem {
     }
 
     handleOverlayClick() {
-        if (Date.now() < this.lockedUntil) return;
         if (this.collectiveForce === '0') {
             this.overlay.classList.remove('active');
             this.keypad.style.pointerEvents = '';
@@ -142,8 +140,7 @@ class ForceSystem {
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
             this.overlay.classList.remove('active');
-            this.keypad.style.pointerEvents = '';    // re-enable buttons
-            this.lockedUntil = Date.now() + 500;     // silent 500ms freeze
+            this.keypad.style.pointerEvents = '';   // re-enable buttons immediately
         }
     }
 
