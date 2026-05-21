@@ -66,19 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pressTimer) clearTimeout(pressTimer);
     });
 
-    // Tapping the display area during collective force also types a digit
-    document.getElementById('display-area').addEventListener('pointerup', () => {
-        if (forceSystem.collectiveForce !== '0') forceSystem.handleOverlayClick();
-    });
-
     function handleButtonPress(btn) {
-        // Freeze: ignore all input during the lock window
-        if (forceSystem.locked) return;
-        // During collective force every button tap types the next digit
-        if (forceSystem.collectiveForce !== '0') {
-            forceSystem.handleOverlayClick();
-            return;
-        }
+        // Overlay handles all input during collective force / lock — buttons get nothing
+        if (forceSystem.collectiveForce !== '0' || forceSystem.locked) return;
 
         if (btn.classList.contains('btn-number')) {
             const val = parseInt(btn.dataset.value);
