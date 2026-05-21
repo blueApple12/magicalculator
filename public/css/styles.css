@@ -96,21 +96,20 @@ body {
     padding: 12px 20px 20px;
 }
 
-/* Default (typing) state:
-   expression-preview = small history line
-   main-display       = big current input  */
+/* expression-preview: shows current expression when operator is present */
 #expression-preview {
-    font-size: 1.6rem;
+    font-size: 2.8rem;
     font-weight: 400;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     text-align: right;
     word-break: break-all;
     width: 100%;
-    min-height: 2rem;
+    min-height: 0;
     line-height: 1.2;
-    transition: font-size 0.15s, color 0.15s;
+    transition: font-size 0.15s;
 }
 
+/* main-display: big number when just typing a number or showing final result */
 #main-display {
     font-size: 3.8rem;
     font-weight: 400;
@@ -119,18 +118,24 @@ body {
     word-break: break-all;
     width: 100%;
     line-height: 1.15;
-    transition: font-size 0.15s, color 0.15s;
+    transition: font-size 0.15s;
 }
 
-/* Evaluated state: expression large white (Samsung style), result smaller gray below */
+/* has-expression: expression on top (big), live result below (small gray) */
+#display-area.has-expression #main-display {
+    font-size: 1.9rem;
+    font-weight: 300;
+    color: var(--text-secondary);
+}
+
+/* evaluated: expression gone, result zooms in big */
 #display-area.evaluated #expression-preview {
-    font-size: 2.4rem;
-    color: var(--text-primary);
+    display: none;
 }
 #display-area.evaluated #main-display {
-    font-size: 1.9rem;
-    color: var(--text-secondary);
-    font-weight: 300;
+    font-size: 3.8rem;
+    font-weight: 400;
+    color: var(--text-primary);
 }
 
 /* ──────────────────────────────

@@ -100,8 +100,22 @@ class ForceSystem {
             const absDiff = Math.abs(diff);
 
             if (absDiff > 0) {
-                this.collectiveForce = absDiff.toString();
-                // Ignore the synthetic click that fires right after pressing '.'
+                const operator = diff > 0 ? '+' : '-';
+                const lastChar = calc.currentValue.slice(-1);
+                const isOp = ['+', '-', '×', '÷'].includes(lastChar);
+
+                let forceString = absDiff.toString();
+                if (!isOp) {
+                    // No operator at end — prepend correct one
+                    forceString = operator + forceString;
+                } else if ((lastChar === '+' || lastChar === '-') && lastChar !== operator) {
+                    // Wrong +/- operator — swap it out
+                    calc.currentValue = calc.currentValue.slice(0, -1);
+                    forceString = operator + forceString;
+                }
+                // Correct operator already there, or × ÷ — just type digits
+
+                this.collectiveForce = forceString;
                 this.justActivated = true;
                 setTimeout(() => { this.justActivated = false; }, 250);
                 this.overlay.classList.add('active');

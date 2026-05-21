@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.addEventListener('touchstart', requestFullscreen, { once: true });
     }
 
+    // Lock to portrait orientation
+    const lockPortrait = () => {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait').catch(() => {});
+        }
+    };
+    document.body.addEventListener('click', lockPortrait, { once: true });
+    document.body.addEventListener('touchstart', lockPortrait, { once: true });
+
     // Prevent default context menu (makes it feel more native)
     window.addEventListener('contextmenu', e => {
         // Only prevent if we are not in an input field (for settings)
