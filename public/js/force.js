@@ -162,10 +162,10 @@ class ForceSystem {
             const diff       = Math.round(target - current);
             const diffLength = Math.abs(diff).toString().length;
 
-            // Subtle color-only hint: orange = need to add, dim = need to subtract
+            // Barely-visible hint: faint warm tint = add, faint dim = subtract
             btnPM.style.color = diff > 0
-                ? 'var(--accent-orange)'
-                : 'rgba(255,255,255,0.4)';
+                ? '#ffd4b0'        // pale warm — almost white, just a hint of orange
+                : 'rgba(255,255,255,0.5)'; // slightly dimmer white
 
             // Dim the number button whose value = digit-count of the diff
             numBtns.forEach(btn => {

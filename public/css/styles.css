@@ -57,12 +57,6 @@ body {
     flex-shrink: 0;
 }
 
-#app-title {
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--text-secondary);
-}
-
 #menu-btn {
     background: none;
     border: none;
