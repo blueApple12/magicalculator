@@ -11,7 +11,9 @@ class Calculator {
     }
 
     updateDisplay() {
-        this.displayElement.innerText = this.formatExpression(this.currentValue);
+        this.displayElement.innerText = this.isEvaluated
+            ? '= ' + this.formatExpression(this.currentValue)
+            : this.formatExpression(this.currentValue);
         this.previewElement.innerText = this.formatExpression(this.expression);
         this.adjustFontSize();
     }
@@ -226,7 +228,7 @@ class Calculator {
             let cleanValue = this.currentValue.replace(/[+\-×÷.]$/, '');
             if (!cleanValue) cleanValue = '0';
 
-            this.expression = cleanValue + '=';
+            this.expression = cleanValue;
             
             // Format for JS evaluation
             let evalString = cleanValue
