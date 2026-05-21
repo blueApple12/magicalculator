@@ -162,17 +162,21 @@ class ForceSystem {
             const diff       = Math.round(target - current);
             const diffLength = Math.abs(diff).toString().length;
 
-            // Barely-visible hint: faint warm tint = add, faint dim = subtract
-            btnPM.style.color = diff > 0
-                ? '#ffd4b0'        // pale warm — almost white, just a hint of orange
-                : 'rgba(255,255,255,0.5)'; // slightly dimmer white
+            // Show +/- with just the relevant sign in a faint warm tint
+            btnPM.style.fontSize = '1.3rem';
+            if (diff > 0) {
+                btnPM.innerHTML = '<span style="color:#ffd4b0">+</span>/-';
+            } else {
+                btnPM.innerHTML = '+/<span style="color:#ffd4b0">-</span>';
+            }
 
             // Dim the number button whose value = digit-count of the diff
             numBtns.forEach(btn => {
                 btn.classList.toggle('dimmed', parseInt(btn.dataset.value) === diffLength);
             });
         } else {
-            btnPM.style.color = '';
+            btnPM.style.fontSize = '';
+            btnPM.textContent = '±';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
     }
