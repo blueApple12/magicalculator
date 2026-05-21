@@ -72,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function handleButtonPress(btn) {
+        // Freeze: ignore all input during the lock window
+        if (forceSystem.locked) return;
         // During collective force every button tap types the next digit
         if (forceSystem.collectiveForce !== '0') {
             forceSystem.handleOverlayClick();

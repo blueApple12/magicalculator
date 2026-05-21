@@ -7,7 +7,6 @@ class ForceSystem {
         this.hud = false;
         this.locked = false;
 
-        this.overlay = document.getElementById('collective-force-overlay');
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
@@ -97,9 +96,8 @@ class ForceSystem {
                     forceString = operator + forceString;
                 }
 
-                this.collectiveForce = forceString;
-                // Delay overlay so the synthetic click from '.' doesn't consume the first digit
-                setTimeout(() => { this.overlay.classList.add('active'); }, 250);
+                // Delay so the synthetic click from '.' doesn't consume the first digit
+                setTimeout(() => { this.collectiveForce = forceString; }, 250);
             }
 
             this.vibrate();
@@ -120,10 +118,7 @@ class ForceSystem {
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
             this.locked = true;
-            setTimeout(() => {
-                this.locked = false;
-                this.overlay.classList.remove('active');
-            }, 500);
+            setTimeout(() => { this.locked = false; }, 500);
         }
     }
 
