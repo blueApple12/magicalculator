@@ -122,16 +122,15 @@ body {
     transition: font-size 0.15s, color 0.15s;
 }
 
-/* Evaluated state (matches Samsung screenshot):
-   expression shown large at top, result smaller below */
+/* Evaluated state: answer big and bright, expression small and dim above it */
 #display-area.evaluated #expression-preview {
-    font-size: 2.8rem;
-    color: var(--text-primary);
+    font-size: 1.6rem;
+    color: var(--text-secondary);
 }
 #display-area.evaluated #main-display {
-    font-size: 2rem;
-    color: var(--text-secondary);
-    font-weight: 300;
+    font-size: 3.8rem;
+    color: var(--text-primary);
+    font-weight: 400;
 }
 
 /* ──────────────────────────────
