@@ -1,16 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Request fullscreen on first tap anywhere in the app
-    const requestFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log("Fullscreen error:", err.message);
-            });
-        }
-    };
-    
-    document.body.addEventListener('click', requestFullscreen, { once: true });
-    document.body.addEventListener('touchstart', requestFullscreen, { once: true });
-
     // Prevent default context menu (makes it feel more native)
     window.addEventListener('contextmenu', e => {
         // Only prevent if we are not in an input field (for settings)
