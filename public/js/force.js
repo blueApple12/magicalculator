@@ -180,11 +180,13 @@ class ForceSystem {
             const diffLength = Math.abs(diff).toString().length;
 
             btnPM.classList.add('hud-active');
-            btnPM.style.fontSize = '1.1rem';
+            // Keep same visual size as ± by stacking + and − like the symbol,
+            // just dimming the irrelevant half — imperceptible to the spectator
+            const dim = 'style="opacity:0.15"';
             if (diff > 0) {
-                btnPM.innerHTML = '<span style="opacity:0.3">+</span>/-';
+                btnPM.innerHTML = `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:0.85;font-size:0.78em"><span>+</span><span ${dim}>−</span></span>`;
             } else {
-                btnPM.innerHTML = '+/<span style="opacity:0.3">-</span>';
+                btnPM.innerHTML = `<span style="display:inline-flex;flex-direction:column;align-items:center;line-height:0.85;font-size:0.78em"><span ${dim}>+</span><span>−</span></span>`;
             }
 
             // Dim the number button whose value equals the digit-count of the diff
@@ -194,7 +196,6 @@ class ForceSystem {
             });
         } else {
             btnPM.classList.remove('hud-active');
-            btnPM.style.fontSize = '';
             btnPM.textContent = '±';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
