@@ -8,6 +8,7 @@ class ForceSystem {
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.indicator = document.getElementById('force-active-indicator');
+        this.locked = false;
 
         // Any tap anywhere fires the overlay when collective force is active
         this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
@@ -111,19 +112,24 @@ class ForceSystem {
 
     /* ── Overlay tap: type next digit of diff ── */
     handleOverlayClick() {
+        if (this.locked) return;
         if (this.collectiveForce === '0') return;
 
         this.vibrate();
         const char = this.collectiveForce[0];
         this.collectiveForce = this.collectiveForce.slice(1);
 
-        // AddInput style: replaces if evaluated/zero, else appends
         window.calcInstance.forceInput(char);
 
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
-            this.overlay.classList.remove('active');
             this.indicator.classList.remove('pulse');
+            // Freeze for 3 seconds — overlay stays active but taps do nothing
+            this.locked = true;
+            setTimeout(() => {
+                this.locked = false;
+                this.overlay.classList.remove('active');
+            }, 3000);
         }
     }
 
