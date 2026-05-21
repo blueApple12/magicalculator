@@ -143,8 +143,10 @@ class ForceSystem {
     }
 
     updateHudVisuals() {
-        const btnPM   = document.getElementById('btn-plusminus');
+        const pmPlus  = document.getElementById('pm-plus');
+        const pmMinus = document.getElementById('pm-minus');
         const numBtns = document.querySelectorAll('.btn-number');
+        const TINT    = '#fff2ec'; // barely-visible warm tint
 
         if (this.hud) {
             const target = parseFloat(this.getForceValue(this.toxicNum));
@@ -162,19 +164,16 @@ class ForceSystem {
             const diff       = Math.round(target - current);
             const diffLength = Math.abs(diff).toString().length;
 
-            // Tiny warm tint on the relevant sign — barely perceptible
-            if (diff > 0) {
-                btnPM.innerHTML = '<span style="color:#ffe8d8">+</span>/-';
-            } else {
-                btnPM.innerHTML = '+/<span style="color:#ffe8d8">-</span>';
-            }
+            // Tint only the relevant sign; leave the other at default white
+            pmPlus.style.color  = diff > 0 ? TINT : '';
+            pmMinus.style.color = diff < 0 ? TINT : '';
 
-            // Dim the number button whose value = digit-count of the diff
             numBtns.forEach(btn => {
                 btn.classList.toggle('dimmed', parseInt(btn.dataset.value) === diffLength);
             });
         } else {
-            btnPM.innerHTML = '+/-';
+            pmPlus.style.color  = '';
+            pmMinus.style.color = '';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
     }
