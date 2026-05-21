@@ -6,7 +6,6 @@ class ForceSystem {
         this.collectiveForce = '0';
         this.hud = false;
         this.locked = false;
-        this.justActivated = false;
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', this.handleOverlayClick.bind(this));
@@ -104,9 +103,8 @@ class ForceSystem {
                 }
 
                 this.collectiveForce = forceString;
-                this.justActivated = true;
-                setTimeout(() => { this.justActivated = false; }, 250);
-                this.overlay.classList.add('active');
+                // Delay overlay so the synthetic click from '.' doesn't consume the first digit
+                setTimeout(() => { this.overlay.classList.add('active'); }, 250);
             }
 
             this.vibrate();
@@ -116,7 +114,7 @@ class ForceSystem {
     }
 
     handleOverlayClick() {
-        if (this.locked || this.justActivated) return;
+        if (this.locked) return;
         if (this.collectiveForce === '0') return;
 
         this.vibrate();
