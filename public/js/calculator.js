@@ -36,14 +36,34 @@ class Calculator {
     }
 
     adjustFontSize() {
+        if (this.isEvaluated) {
+            // Let CSS handle evaluated state — clear any inline override
+            this.displayElement.style.fontSize = '';
+            return;
+        }
         const length = this.formatExpression(this.currentValue).length;
         if (length > 12) {
-            this.displayElement.style.fontSize = '2.5rem';
+            this.displayElement.style.fontSize = '2rem';
         } else if (length > 9) {
-            this.displayElement.style.fontSize = '3.5rem';
+            this.displayElement.style.fontSize = '2.8rem';
         } else {
-            this.displayElement.style.fontSize = '5rem';
+            this.displayElement.style.fontSize = '3.8rem';
         }
+    }
+
+    // AddInput equivalent for collective force: no display-clear on evaluated
+    forceInput(char) {
+        if (this.isEvaluated) {
+            this.currentValue = char;
+            this.expression = '';
+            this.isEvaluated = false;
+            this.displayArea.classList.remove('evaluated');
+        } else if (this.currentValue === '0') {
+            this.currentValue = char;
+        } else {
+            this.currentValue += char;
+        }
+        this.updateDisplay();
     }
 
     appendNumber(number) {
