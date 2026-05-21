@@ -6,8 +6,32 @@ class Calculator {
         this.currentValue = '0';
         this.expression = '';
         this.isEvaluated = false;
+        this.history = this.loadHistory();
 
         window.calcInstance = this;
+    }
+
+    loadHistory() {
+        try {
+            const saved = localStorage.getItem('magi_history');
+            return saved ? JSON.parse(saved) : [];
+        } catch(_) { return []; }
+    }
+
+    saveHistory() {
+        localStorage.setItem('magi_history', JSON.stringify(this.history.slice(-20)));
+    }
+
+    renderHistory() {
+        const list = document.getElementById('history-list');
+        if (!list) return;
+        const recent = this.history.slice(-2);
+        list.innerHTML = recent.map(h =>
+            `<div class="history-item">
+                <span class="history-expr">${this.formatExpression(h.expr)}</span>
+                <span class="history-result">= ${this.formatExpression(h.result)}</span>
+            </div>`
+        ).join('');
     }
 
     // Live-evaluate the current expression; returns number or null
@@ -234,6 +258,12 @@ class Calculator {
 
             this.isEvaluated = true;
             this.displayArea.classList.add('evaluated');
+
+            if (this.currentValue !== 'Error') {
+                this.history.push({ expr: this.expression, result: this.currentValue });
+                this.saveHistory();
+                this.renderHistory();
+            }
         } catch (_) {
             this.currentValue = 'Error';
             this.isEvaluated = true;

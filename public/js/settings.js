@@ -4,40 +4,34 @@ class SettingsManager {
         this.closeBtn = document.getElementById('close-settings');
         this.saveBtn = document.getElementById('save-settings');
         this.listContainer = document.getElementById('forces-list');
-        
-        // Secret trigger handling
-        this.triggerArea = document.getElementById('settings-trigger-area');
-        this.touchStartY = 0;
-        this.touchEndY = 0;
-        
+
         this.initTrigger();
         this.initUI();
         this.bindEvents();
     }
 
     initTrigger() {
-        this.lastTwoFingerTapTime = 0;
+        // Primary trigger: ⋮ menu button
+        const menuBtn = document.getElementById('menu-btn');
+        if (menuBtn) menuBtn.addEventListener('click', () => this.open());
 
-        this.triggerArea.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                e.preventDefault(); // Prevent zooming or scrolling
-                const now = new Date().getTime();
-                const timeDiff = now - this.lastTwoFingerTapTime;
-                
-                if (timeDiff < 500 && timeDiff > 0) {
-                    // Double tap with 2 fingers detected!
-                    this.open();
-                    this.lastTwoFingerTapTime = 0; // Reset
-                } else {
-                    this.lastTwoFingerTapTime = now;
+        // Secret backup: 2-finger double-tap anywhere on the header
+        const header = document.getElementById('calc-header');
+        let lastTwoFingerTap = 0;
+        if (header) {
+            header.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const now = Date.now();
+                    if (now - lastTwoFingerTap < 500 && now - lastTwoFingerTap > 0) {
+                        this.open();
+                        lastTwoFingerTap = 0;
+                    } else {
+                        lastTwoFingerTap = now;
+                    }
                 }
-            }
-        }, { passive: false });
-
-        // Keep double click for desktop testing (mouse)
-        this.triggerArea.addEventListener('dblclick', () => {
-            this.open();
-        });
+            }, { passive: false });
+        }
     }
 
     initUI() {
