@@ -1,14 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const isPWA = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
-    // First-tap setup: fullscreen (browser only) + portrait lock
-    const onFirstTap = () => {
-        if (!isPWA && !document.fullscreenElement) {
-            document.documentElement.requestFullscreen({ navigationUI: 'show' }).catch(() => {});
-        }
+    // Fullscreen + portrait lock — keep trying on every user interaction
+    // until fullscreen is actually active (pointerdown doesn't always count as
+    // user activation in mobile browsers; click reliably does)
+    const tryFullscreen = () => {
+        if (isPWA || document.fullscreenElement) return;
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+        if (req) req.call(el, { navigationUI: 'show' })?.catch?.(() => {});
         if (screen.orientation?.lock) screen.orientation.lock('portrait').catch(() => {});
     };
-    document.body.addEventListener('pointerdown', onFirstTap, { once: true });
+    document.body.addEventListener('click',    tryFullscreen);
+    document.body.addEventListener('touchend', tryFullscreen);
 
     // Disable right-click except inside inputs
     addEventListener('contextmenu', e => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
