@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const forceSystem = new ForceSystem();
     const settings    = new SettingsManager();
 
-    // Keypad: fire on pointerdown for instant response
-    document.getElementById('keypad').addEventListener('pointerdown', (e) => {
+    // Keypad: pointerup so long-press % can fire first
+    document.getElementById('keypad').addEventListener('pointerup', (e) => {
         const btn = e.target.closest('.btn');
         if (!btn) return;
         if (forceSystem.isActive() || forceSystem.isFrozen()) return;
@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (btn.id) {
             case 'btn-clear':      calc.clear();                                                   break;
             case 'btn-backspace':  calc.backspace();                                               break;
-            case 'btn-percentage': if (!forceSystem.handlePercentageClick())    calc.percentage(); break;
-            case 'btn-plusminus':  if (!forceSystem.toggleHud())                calc.plusMinus();  break;
+            case 'btn-percentage': if (!forceSystem.pendingSlot) calc.percentage();                break;
+            case 'btn-plusminus':  if (!forceSystem.toggleHud()) calc.plusMinus();                 break;
             case 'btn-dot':        if (!forceSystem.calculateCollectiveForce()) calc.appendDot();  break;
-            case 'btn-equals':     if (!forceSystem.handleEquals())             calc.calculateReal(); break;
+            case 'btn-equals':     calc.calculateReal();                                           break;
         }
     }
 
@@ -63,10 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (k === '*' || k === 'x')                    calc.processOperator('×');
         else if (k === '/')                                 calc.processOperator('÷');
         else if (k === '.' || k === ',')                    { if (!forceSystem.calculateCollectiveForce()) calc.appendDot(); }
-        else if (k === 'Enter' || k === '=')                { e.preventDefault(); if (!forceSystem.handleEquals()) calc.calculateReal(); }
+        else if (k === 'Enter' || k === '=')                { e.preventDefault(); calc.calculateReal(); }
         else if (k === 'Backspace')                         calc.backspace();
         else if (k === 'Escape' || k === 'c' || k === 'C')  calc.clear();
-        else if (k === '%')                                 { if (!forceSystem.handlePercentageClick()) calc.percentage(); }
+        else if (k === '%')                                 { if (!forceSystem.pendingSlot) calc.percentage(); }
     });
 
     // Service worker

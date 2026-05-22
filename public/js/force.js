@@ -2,15 +2,14 @@ class ForceSystem {
     constructor() {
         this.toxicNum = 0;
         this.pendingSlot = false;
-        this.toxicForce = false;
-        this.collectiveForce = '';   // '' = inactive; non-empty = digits left to type
-        this.lockedUntil = 0;        // freeze button presses until this timestamp
+        this.collectiveForce = '';   // '' = inactive
+        this.lockedUntil = 0;
         this.hud = false;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        // pointerdown = instant response (no wait for click to fire)
         this.overlay.addEventListener('pointerdown', () => this.handleOverlayClick());
 
+        // Long-press % to arm slot selection (next number tap picks the slot)
         const pctBtn = document.getElementById('btn-percentage');
         let longPressTimer;
         pctBtn.addEventListener('pointerdown', () => {
@@ -56,16 +55,6 @@ class ForceSystem {
         if (this.pendingSlot) {
             this.toxicNum = num;
             this.pendingSlot = false;
-            this.vibrate();
-            return true;
-        }
-        return false;
-    }
-
-    handlePercentageClick() {
-        if (!this.isActive()) {
-            this.toxicForce = !this.toxicForce;
-            window.calcInstance?.updateDisplay(); // refresh live preview now that the "lie" toggled
             this.vibrate();
             return true;
         }
@@ -171,19 +160,5 @@ class ForceSystem {
             pmMinus.style.color = '';
             numBtns.forEach(btn => btn.classList.remove('dimmed'));
         }
-    }
-
-    handleEquals() {
-        if (!this.isActive() && this.toxicForce) {
-            this.toxicForce = false;
-            const calc = window.calcInstance;
-            calc.expression  = calc.currentValue;
-            calc.currentValue = this.getForceValue(this.toxicNum);
-            calc.isEvaluated  = true;
-            calc.displayArea.classList.add('evaluated');
-            calc.updateDisplay();
-            return true;
-        }
-        return false;
     }
 }
