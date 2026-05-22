@@ -1,4 +1,4 @@
-const CACHE_NAME = 'magicalculator-v31';
+const CACHE_NAME = 'magicalculator';
 const urlsToCache = [
   './',
   './index.html',
@@ -19,20 +19,20 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  self.clients.claim();
-  event.waitUntil(
-    caches.keys().then(cacheNames =>
-      Promise.all(
-        cacheNames
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      )
-    )
-  );
+  event.waitUntil(self.clients.claim());
 });
 
+// Network-first: always try fresh, fall back to cache when offline.
+// Cache is updated in the background on every successful fetch.
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
