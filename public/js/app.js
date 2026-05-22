@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleButtonPress(btn) {
         // Overlay handles all input during collective force / lock — buttons get nothing
-        if (forceSystem.collectiveForce !== '0') return;
+        if (forceSystem.isActive() || forceSystem.isFrozen()) return;
 
         if (btn.classList.contains('btn-number')) {
             const val = parseInt(btn.dataset.value);

@@ -3,14 +3,13 @@ class ForceSystem {
         this.toxicNum = 0;
         this.pendingSlot = false;
         this.toxicForce = false;
-        this.collectiveForce = '0';
+        this.collectiveForce = '';   // '' = inactive; non-empty = digits left to type
+        this.lockedUntil = 0;        // freeze button presses until this timestamp
         this.hud = false;
-        this.lockedUntil = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', () => this.handleOverlayClick());
 
-        // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
         let longPressTimer;
         pctBtn.addEventListener('pointerdown', () => {
@@ -24,6 +23,9 @@ class ForceSystem {
 
         this.vibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
     }
+
+    isActive() { return this.collectiveForce !== ''; }
+    isFrozen() { return Date.now() < this.lockedUntil; }
 
     getForces() {
         try {
@@ -59,7 +61,7 @@ class ForceSystem {
     }
 
     handlePercentageClick() {
-        if (this.collectiveForce === '0') {
+        if (!this.isActive()) {
             this.toxicForce = !this.toxicForce;
             this.vibrate();
             return true;
@@ -68,7 +70,7 @@ class ForceSystem {
     }
 
     calculateCollectiveForce() {
-        if (this.collectiveForce !== '0') return false;
+        if (this.isActive()) return false;
 
         const target = parseFloat(this.getForceValue(this.toxicNum));
         const calc   = window.calcInstance;
@@ -111,25 +113,22 @@ class ForceSystem {
     }
 
     handleOverlayClick() {
-        // Freeze: ignore taps during the 1-second window after the last digit
-        if (Date.now() < this.lockedUntil) return;
-        if (this.collectiveForce === '0') return;
+        if (this.isFrozen()) return;
+        if (!this.isActive()) return;
 
         this.vibrate();
         const char = this.collectiveForce[0];
         this.collectiveForce = this.collectiveForce.slice(1);
         window.calcInstance.forceInput(char);
 
-        if (this.collectiveForce === '') {
-            this.collectiveForce = '0';
-            // 1-second freeze — overlay stays active so taps are caught and ignored
-            this.lockedUntil = Date.now() + 1000;
-            setTimeout(() => this.overlay.classList.remove('active'), 1000);
+        if (!this.isActive()) {
+            this.overlay.classList.remove('active');
+            this.lockedUntil = Date.now() + 1000;  // 1-second freeze after last digit
         }
     }
 
     toggleHud() {
-        if (this.collectiveForce === '0') {
+        if (!this.isActive()) {
             this.hud = !this.hud;
             this.updateHudVisuals();
         }
@@ -172,7 +171,7 @@ class ForceSystem {
     }
 
     handleEquals() {
-        if (this.collectiveForce === '0' && this.toxicForce) {
+        if (!this.isActive() && this.toxicForce) {
             this.toxicForce = false;
             const calc = window.calcInstance;
             calc.expression  = calc.currentValue;
