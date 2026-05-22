@@ -1,4 +1,4 @@
-const CACHE_NAME = 'magicalculator-v29';
+const CACHE_NAME = 'magicalculator-v30';
 const urlsToCache = [
   './',
   './index.html',

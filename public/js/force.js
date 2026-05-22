@@ -5,6 +5,7 @@ class ForceSystem {
         this.toxicForce = false;
         this.collectiveForce = '0';
         this.hud = false;
+        this.lockedUntil = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
         this.overlay.addEventListener('click', () => this.handleOverlayClick());
@@ -110,6 +111,8 @@ class ForceSystem {
     }
 
     handleOverlayClick() {
+        // Freeze: ignore taps during the 1-second window after the last digit
+        if (Date.now() < this.lockedUntil) return;
         if (this.collectiveForce === '0') return;
 
         this.vibrate();
@@ -119,7 +122,9 @@ class ForceSystem {
 
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
-            this.overlay.classList.remove('active');
+            // 1-second freeze — overlay stays active so taps are caught and ignored
+            this.lockedUntil = Date.now() + 1000;
+            setTimeout(() => this.overlay.classList.remove('active'), 1000);
         }
     }
 
