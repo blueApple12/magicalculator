@@ -5,23 +5,9 @@ class ForceSystem {
         this.toxicForce = false;
         this.collectiveForce = '0';
         this.hud = false;
-        this.lastTapTime = 0;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        this.keypad = document.getElementById('keypad');
-
-        // Use pointerup ONLY (fires exactly once on mobile, no synthetic-click duplicates)
-        // with debounce so any stray duplicate within 80ms is dropped
-        this.overlay.addEventListener('pointerup', (e) => {
-            e.stopPropagation();
-            const now = Date.now();
-            if (now - this.lastTapTime < 80) return;
-            this.lastTapTime = now;
-            this.handleOverlayClick();
-        });
-        // Block any clicks that try to leak through to buttons under the overlay
-        this.overlay.addEventListener('click',     (e) => { e.stopPropagation(); e.preventDefault(); });
-        this.overlay.addEventListener('touchstart',(e) => { e.preventDefault(); }, { passive: false });
+        this.overlay.addEventListener('click', () => this.handleOverlayClick());
 
         // Long-press % to arm slot selection
         const pctBtn = document.getElementById('btn-percentage');
@@ -81,56 +67,50 @@ class ForceSystem {
     }
 
     calculateCollectiveForce() {
-        if (this.collectiveForce === '0') {
-            const target = parseFloat(this.getForceValue(this.toxicNum));
-            const calc   = window.calcInstance;
+        if (this.collectiveForce !== '0') return false;
 
-            let current = 0;
-            try {
-                const raw = calc.currentValue
-                    .replace(/[+\-×÷.]$/, '')
-                    .replace(/×/g, '*')
-                    .replace(/÷/g, '/')
-                    .replace(/,/g, '');
-                current = parseFloat(new Function('return ' + (raw || '0'))()) || 0;
-            } catch(_) {}
+        const target = parseFloat(this.getForceValue(this.toxicNum));
+        const calc   = window.calcInstance;
 
-            const diff    = Math.round(target - current);
-            const absDiff = Math.abs(diff);
+        let current = 0;
+        try {
+            const raw = calc.currentValue
+                .replace(/[+\-×÷.]$/, '')
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/')
+                .replace(/,/g, '');
+            current = parseFloat(new Function('return ' + (raw || '0'))()) || 0;
+        } catch(_) {}
 
-            if (absDiff > 0) {
-                const operator = diff > 0 ? '+' : '-';
-                const lastChar = calc.currentValue.slice(-1);
-                const isOp = ['+', '-', '×', '÷'].includes(lastChar);
+        const diff    = Math.round(target - current);
+        const absDiff = Math.abs(diff);
 
-                let forceString = absDiff.toString();
-                if (!isOp) {
-                    forceString = operator + forceString;
-                } else if ((lastChar === '+' || lastChar === '-') && lastChar !== operator) {
-                    calc.currentValue = calc.currentValue.slice(0, -1);
-                    forceString = operator + forceString;
-                }
+        if (absDiff > 0) {
+            const operator = diff > 0 ? '+' : '-';
+            const lastChar = calc.currentValue.slice(-1);
+            const isOp = ['+', '-', '×', '÷'].includes(lastChar);
 
-                // Delay so the '.' press / synthetic events don't trigger the first digit
-                setTimeout(() => {
-                    this.collectiveForce = forceString;
-                    this.overlay.classList.add('active');
-                    this.keypad.style.pointerEvents = 'none'; // hard-block button taps
-                }, 250);
+            let forceString = absDiff.toString();
+            if (!isOp) {
+                forceString = operator + forceString;
+            } else if ((lastChar === '+' || lastChar === '-') && lastChar !== operator) {
+                calc.currentValue = calc.currentValue.slice(0, -1);
+                forceString = operator + forceString;
             }
 
-            this.vibrate();
-            return true;
+            // Delay so the '.' synthetic click doesn't consume the first digit
+            setTimeout(() => {
+                this.collectiveForce = forceString;
+                this.overlay.classList.add('active');
+            }, 250);
         }
-        return false;
+
+        this.vibrate();
+        return true;
     }
 
     handleOverlayClick() {
-        if (this.collectiveForce === '0') {
-            this.overlay.classList.remove('active');
-            this.keypad.style.pointerEvents = '';
-            return;
-        }
+        if (this.collectiveForce === '0') return;
 
         this.vibrate();
         const char = this.collectiveForce[0];
@@ -140,7 +120,6 @@ class ForceSystem {
         if (this.collectiveForce === '') {
             this.collectiveForce = '0';
             this.overlay.classList.remove('active');
-            this.keypad.style.pointerEvents = '';   // re-enable buttons immediately
         }
     }
 
@@ -156,7 +135,7 @@ class ForceSystem {
         const pmPlus  = document.getElementById('pm-plus');
         const pmMinus = document.getElementById('pm-minus');
         const numBtns = document.querySelectorAll('.btn-number');
-        const TINT    = '#ffaa70'; // soft orange tint
+        const TINT    = '#ffaa70';
 
         if (this.hud) {
             const target = parseFloat(this.getForceValue(this.toxicNum));
@@ -174,7 +153,6 @@ class ForceSystem {
             const diff       = Math.round(target - current);
             const diffLength = Math.abs(diff).toString().length;
 
-            // Tint only the relevant sign; leave the other at default white
             pmPlus.style.color  = diff > 0 ? TINT : '';
             pmMinus.style.color = diff < 0 ? TINT : '';
 
