@@ -8,7 +8,8 @@ class ForceSystem {
         this.hud = false;
 
         this.overlay = document.getElementById('collective-force-overlay');
-        this.overlay.addEventListener('click', () => this.handleOverlayClick());
+        // pointerdown = instant response (no wait for click to fire)
+        this.overlay.addEventListener('pointerdown', () => this.handleOverlayClick());
 
         const pctBtn = document.getElementById('btn-percentage');
         let longPressTimer;
