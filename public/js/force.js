@@ -23,6 +23,7 @@ class ForceSystem {
         pctBtn.addEventListener('pointerleave', () => clearTimeout(longPressTimer));
 
         this.vibrate = () => { if (navigator.vibrate) navigator.vibrate(10); };
+        window.forceSystem = this;
     }
 
     isActive() { return this.collectiveForce !== ''; }
@@ -64,6 +65,7 @@ class ForceSystem {
     handlePercentageClick() {
         if (!this.isActive()) {
             this.toxicForce = !this.toxicForce;
+            window.calcInstance?.updateDisplay(); // refresh live preview now that the "lie" toggled
             this.vibrate();
             return true;
         }

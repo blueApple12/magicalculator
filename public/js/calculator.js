@@ -10,15 +10,22 @@ class Calculator {
         window.calcInstance = this;
     }
 
-    // Live-evaluate the current expression; returns number or null
+    // Live-evaluate the current expression; returns number/string or null.
+    // When toxic force is armed, the preview "lies" and shows the forced value
+    // so pressing = afterwards looks like a smooth zoom rather than a magic switch.
     tryCalculate() {
+        let clean = this.currentValue
+            .replace(/[+\-×÷.]$/, '')
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/,/g, '');
+        if (!clean || !/[+\-*/]/.test(clean)) return null;
+
+        if (window.forceSystem?.toxicForce) {
+            return window.forceSystem.getForceValue(window.forceSystem.toxicNum);
+        }
+
         try {
-            let clean = this.currentValue
-                .replace(/[+\-×÷.]$/, '')
-                .replace(/×/g, '*')
-                .replace(/÷/g, '/')
-                .replace(/,/g, '');
-            if (!clean || !/[+\-*/]/.test(clean)) return null;
             const result = new Function('return ' + clean)();
             if (typeof result !== 'number' || !isFinite(result) || isNaN(result)) return null;
             return Math.round(result * 1e9) / 1e9;
